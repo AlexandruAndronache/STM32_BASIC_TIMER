@@ -47,7 +47,7 @@
 
 /* Private function prototypes -----------------------------------------------*/
 /* USER CODE BEGIN PFP */
-
+void HAL_TIM_Base_MspInit(TIM_HandleTypeDef *timer);
 /* USER CODE END PFP */
 
 /* External functions --------------------------------------------------------*/
@@ -81,5 +81,17 @@ void HAL_MspInit(void)
 }
 
 /* USER CODE BEGIN 1 */
+
+void HAL_TIM_Base_MspInit(TIM_HandleTypeDef *timer)
+{
+	//1. Enavle the clock for the peripheral
+	__HAL_RCC_TIM6_CLK_ENABLE();
+
+	//2. Enable the IRQ
+	HAL_NVIC_EnableIRQ(TIM6_DAC_IRQn);
+
+	//3. Setup the priority
+	HAL_NVIC_SetPriority(TIM6_DAC_IRQn, 15, 0);
+}
 
 /* USER CODE END 1 */

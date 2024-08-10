@@ -27,6 +27,7 @@
 void SystemClock_Config(void);
 void MX_FREERTOS_Init(void);
 void TIMER6_INIT(void);
+void GPIO_INIT(void);
 
 TIM_HandleTypeDef htimer6;
 
@@ -39,6 +40,7 @@ int main(void)
 
   TIMER6_INIT();
 
+  GPIO_INIT();
 
 
   while (1);
@@ -47,8 +49,49 @@ int main(void)
 
 }
 
+void GPIO_INIT()
+{
+	//GPIO_TypeDef gpio;
+
+	GPIO_InitTypeDef gpio_handle;
+
+	gpio_handle.Pin = GPIO_PIN_5;
+	gpio_handle.Mode = GPIO_MODE_OUTPUT_PP;
+	gpio_handle.Pull = GPIO_NOPULL;
+	gpio_handle.Speed = GPIO_SPEED_FREQ_MEDIUM;
+
+
+
+	__HAL_RCC_GPIOA_CLK_ENABLE();
+	HAL_GPIO_Init(GPIOA, &gpio_handle);
+	//HAL_GPIO_WritePin();
+
+	//Let's start the timer
+	HAL_TIM_Base_Start(&htimer6);
+
+
+	while(1)
+	{
+	//Set Interrupt flag
+	while(!(TIM6 -> SR & TIM_SR_UIF));
+	//The required time (100 ms) has elapsed
+	TIM6 -> SR = 0;
+	HAL_GPIO_TogglePin(GPIOA, GPIO_PIN_5);
+	}
+
+}
+
 void TIMER6_INIT(void)
 {
+	htimer6.Instance = TIM6;
+	htimer6.Init.Prescaler = 24;
+	htimer6.Init.Period = 64000 - 1;
+	if(HAL_TIM_Base_Init(&htimer6) != HAL_OK)
+	{
+		Error_Handler();
+	}
+
+
 
 }
 
